@@ -10,7 +10,8 @@ var MyApp = (function($) {
         // Show/hide extended details on h3 click:
         $("#takers").on("click", "h3", function(evt) {
             $(this).siblings(".details").toggle();
-        })
+            // TODO: toggle class so we can use disclosure triangles
+        });
     })();
 
     // Using AJAX, fetch all users from the API:
