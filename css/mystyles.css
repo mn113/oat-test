@@ -12,12 +12,26 @@ body {
 }
 
 h3 {
+    font-size: 1.5em;
     cursor: pointer;
+}
+
+#takers {
+
+}
+
+#takers li {
+
+}
+
+#takers li:hover {
+    background: lightcyan;
 }
 
 .details {
     display: none;
     padding-left: 1em;
+    line-height: 1.2em;
 }
 
 label {
