@@ -3,14 +3,29 @@
 var MyApp = (function($) {
     var apiBaseUrl = "https://hr.oat.taocloud.org/v1";
     var users = [];
+    var defaultTarget = "#takers";
 
     // Init function:
+    // Wire up behaviours:
     (function() {
-        // Wire up behaviours:
         // Show/hide extended details on h3 click:
         $("#takers").on("click", "h3", function(evt) {
-            $(this).siblings(".details").toggle();
-            // TODO: toggle class so we can use disclosure triangles
+            $(this).closest("li").toggleClass("open");
+        });
+
+        // Fetcher link:
+        $("#fetcher").on("click", function(evt) {
+            $(this).prop("disabled", true);
+            getUsers();
+        });
+
+        // Individual fetcher icons:
+        $("#takers").on("click", ".refresher", function(evt) {
+            evt.preventDefault();
+            // Extract user's id from the <li> above:
+            var userIdString = $(this).closest("li").attr("id");
+            var userId = parseInt(userIdString.substring(4), 10);
+            getUserById(userId);
         });
     })();
 
@@ -31,7 +46,9 @@ var MyApp = (function($) {
                     getUserById(user.userId);
                 });
                 // Render all the users:
-                renderUsers("#takers");
+                renderUsers();
+                // Re-enable button:
+                $("#fetcher").prop("disabled", false);
             },
             error: function(xhr, type) {
                 console.error('Ajax error! Trying again in 5s...');
@@ -64,7 +81,7 @@ var MyApp = (function($) {
                     users.push(data);
                 }
                 // Render this user's extended details:
-                renderUser(data, "#takers");
+                renderUser(data);
             },
             error: function(xhr, type) {
                 console.error('Ajax error! Could not retrieve user', userId);
@@ -73,7 +90,7 @@ var MyApp = (function($) {
     };
 
     // Render all the users we know, overwriting previous content:
-    function renderUsers(target) {
+    function renderUsers(target = defaultTarget) {
         // Clear destination element:
         $(target).html();
 
@@ -88,24 +105,32 @@ var MyApp = (function($) {
     }
 
     // Render a single user:
-    function renderUser(userObj, target) {
+    function renderUser(userObj, target = defaultTarget) {
         console.log("Rendering user:", userObj);
 
         // Find specific user <li> so we can update it:
         var li = $(`li#user${userObj.userId}`);
 
-        var html = `<li id="user${userObj.userId}">
-            <h3>${userObj.firstName} ${userObj.lastName}</h3>`;
+        var html = `<li class="row" id="user${userObj.userId}">
+            <h3>${userObj.firstName} ${userObj.lastName}
+                <span>userId: ${userObj.userId}</span>
+                <a href="#" class="refresher">Refresh</a>            
+            </h3>`;
+        
         // If user data is extended, render that info in a container:
         // Sensitive data should not be rendered
         if (undefined !== userObj.login) {
-            html += `<div class="details">
-                <p><label>Title:</label> ${userObj.title}</p>
-                <p><label>Address:</label> ${userObj.address}</p>
-                <p><label>Email:</label> ${userObj.email}</p>
-                <p><label>Gender:</label> ${userObj.gender}</p>
-                <p><label>Login:</label> ${userObj.login}</p>
-            </div>`;
+            html += `<div class="details">`;
+            if (userObj.picture) {
+                html += `<img src="${userObj.picture}">`;
+            }
+            // Loop through properties:
+            for (var key of Object.keys(userObj)) {
+                if (key !== 'password' && key !== 'picture') {
+                    html += `<p><label>${key}:</label> ${userObj[key]}</p>`;
+                }
+            }
+            html += '</div>';
         }
         html += '</li>';
 

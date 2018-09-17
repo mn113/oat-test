@@ -6,34 +6,73 @@ html, body {
     font-family: "Roboto", Arial, sans-serif;
     color: #222;
 }
-
 body {
     font-size: 1.4em;
 }
 
 h3 {
     font-size: 1.5em;
+    margin: 0.25em 0;
     cursor: pointer;
+}
+h3 span {
+    font-size: 1.2rem;
+    color: #bbb;
 }
 
 #takers {
-
+    margin: 2em 3em;
+    list-style: none;
+    padding: 0;
 }
-
 #takers li {
-
+    border: 1px solid #eee;
+    border-bottom: 0;
+    padding: 0 0.5em;
 }
-
+#takers li:last-child {
+    border-bottom: 1px solid #eee;
+}
+#takers li h3::before  {
+    content: "\25B8";
+    padding-right: 0.3em;
+}
+#takers li.open h3::before {
+    content: "\25BE";
+}
 #takers li:hover {
     background: lightcyan;
 }
 
 .details {
-    display: none;
-    padding-left: 1em;
-    line-height: 1.2em;
+    height: 0px;
+    padding-left: 2em;
+    line-height: 1.1em;
+    transition: height 0.75s linear;    /* animate opening/closing */
+    overflow: hidden;
+}
+li.open .details {
+    height: auto;
+}
+.details label {
+    font-weight: bold;
+}
+.details img {
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
 }
 
-label {
-    font-weight: bold;
+.refresher {
+    font-size: 0.7em;
+    color: #aaa;
+    text-decoration: none;
+    display: none;
+    margin-left: 3em;
+}
+li:hover .refresher {
+    display: inline;
+}
+.refresher:hover {
+    color: #666;
 }
