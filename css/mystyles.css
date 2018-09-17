@@ -17,6 +17,7 @@ h3 {
 
 .details {
     display: none;
+    padding-left: 1em;
 }
 
 label {

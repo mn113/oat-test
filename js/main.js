@@ -14,22 +14,22 @@ var MyApp = (function($) {
     })();
 
     // Using AJAX, fetch all users from the API:
+    // TODO: implement extra params
     function getUsers(name = "", limit = 20, offset = 0) {
         $.ajax({
             type: 'GET',
-            url: `${apiBaseUrl}/users?name=${name}&limit=3&offset=${offset}`,   // FIXME:
+            url: `${apiBaseUrl}/users?name=${name}&limit=${limit}&offset=${offset}`,
             dataType: 'json',
             timeout: 750,
             success: function(data){
                 console.log("Received", data.length, "users");
                 // Store them locally:
                 users = data;
-                console.log("Users:", users);
                 // Fetch the individual users' details:
                 users.forEach(function(user) {
                     getUserById(user.userId);
                 });
-                // Render all the users
+                // Render all the users:
                 renderUsers("#takers");
             },
             error: function(xhr, type) {
@@ -37,10 +37,12 @@ var MyApp = (function($) {
                 setTimeout(function() {
                     getUsers();
                 }, 5000);
+                // TODO: check if this is a good practice...
             }
         })
     }
 
+    // Fetch a single user by his ID:
     function getUserById(userId) {
         $.ajax({
             type: 'GET',
@@ -48,11 +50,11 @@ var MyApp = (function($) {
             dataType: 'json',
             timeout: 750,
             success: function(data){
-                console.log("Received", data);
+                console.log("Received user:", data);
                 data.userId = parseInt(data.userId, 10);
                 // Add the data to local data:
                 var index = users.findIndex(user => user.userId == data.userId);
-                // If it exists, overwrite:
+                // If userId exists, overwrite data:
                 if (index > -1) {
                     users[index] = data;
                 }
@@ -60,8 +62,8 @@ var MyApp = (function($) {
                 else {
                     users.push(data);
                 }
-                // Render the user's extended details:
-                renderUser(data);
+                // Render this user's extended details:
+                renderUser(data, "#takers");
             },
             error: function(xhr, type) {
                 console.error('Ajax error! Could not retrieve user', userId);
@@ -69,19 +71,22 @@ var MyApp = (function($) {
         });
     };
 
+    // Render all the users we know, overwriting previous content:
     function renderUsers(target) {
-        // Clear destination:
+        // Clear destination element:
         $(target).html();
 
         if (users.length === 0) {
-            $(target).html("No users found");
-            return;
+            $(target).html("<p>No users found.</p>");
         }
-        users.forEach(function(user) {
-            renderUser(user, target);
-        });
+        else {
+            users.forEach(function(user) {
+                renderUser(user, target);
+            });
+        }
     }
 
+    // Render a single user:
     function renderUser(userObj, target) {
         console.log("Rendering user:", userObj);
 
