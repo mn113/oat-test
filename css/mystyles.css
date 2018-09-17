@@ -1,0 +1,24 @@
+html, body {
+    height: 100%;
+    font-size: 62.5%;
+    line-height: 1.4;
+    box-sizing: border-box;
+    font-family: "Roboto", Arial, sans-serif;
+    color: #222;
+}
+
+body {
+    font-size: 1.4em;
+}
+
+h3 {
+    cursor: pointer;
+}
+
+.details {
+    display: none;
+}
+
+label {
+    font-weight: bold;
+}

@@ -7,13 +7,17 @@ var MyApp = (function($) {
     // Init function:
     (function() {
         // Wire up behaviours:
+        // Show/hide extended details on h3 click:
+        $("#takers").on("click", "h3", function(evt) {
+            $(this).siblings(".details").toggle();
+        })
     })();
 
     // Using AJAX, fetch all users from the API:
     function getUsers(name = "", limit = 20, offset = 0) {
         $.ajax({
             type: 'GET',
-            url: `${apiBaseUrl}/users?name=${name}&limit=${limit}&offset=${offset}`,
+            url: `${apiBaseUrl}/users?name=${name}&limit=3&offset=${offset}`,   // FIXME:
             dataType: 'json',
             timeout: 750,
             success: function(data){
@@ -56,8 +60,8 @@ var MyApp = (function($) {
                 else {
                     users.push(data);
                 }
-                // Render the user's details:
-                //renderUser()
+                // Render the user's extended details:
+                renderUser(data);
             },
             error: function(xhr, type) {
                 console.error('Ajax error! Could not retrieve user', userId);
@@ -68,38 +72,53 @@ var MyApp = (function($) {
     function renderUsers(target) {
         // Clear destination:
         $(target).html();
-        console.log("First", users[0]);
 
         if (users.length === 0) {
             $(target).html("No users found");
             return;
         }
-        for (var user of users) {
+        users.forEach(function(user) {
             renderUser(user, target);
-            // var userItem = new UserItem(user);
-            // $(target).append(userItem);
-        }
+        });
     }
 
     function renderUser(userObj, target) {
         console.log("Rendering user:", userObj);
+
+        // Find specific user <li> so we can update it:
+        var li = $(`li#user${userObj.userId}`);
+
         var html = `<li id="user${userObj.userId}">
             <h3>${userObj.firstName} ${userObj.lastName}</h3>`;
-        if (userObj.details) {
+        // If user data is extended, render that info in a container:
+        // Sensitive data should not be rendered
+        if (undefined !== userObj.login) {
             html += `<div class="details">
-            
+                <p><label>Title:</label> ${userObj.title}</p>
+                <p><label>Address:</label> ${userObj.address}</p>
+                <p><label>Email:</label> ${userObj.email}</p>
+                <p><label>Gender:</label> ${userObj.gender}</p>
+                <p><label>Login:</label> ${userObj.login}</p>
             </div>`;
         }
         html += '</li>';
-        $(target).append(html);
+
+        // Replace existing <li> or append new one:
+        if (li.length > 0) {
+            li.first().replaceWith(html)
+        }
+        else {
+            $(target).append(html);
+        }
     }
 
     // Reveal the module's methods:
     return {
         users: users,
-        getUserById: getUserById,
         getUsers: getUsers,
-        renderUsers: renderUsers
+        getUserById: getUserById,
+        renderUsers: renderUsers,
+        renderUser: renderUser
     };
 
 }($));
