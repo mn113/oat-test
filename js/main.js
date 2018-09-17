@@ -44,8 +44,10 @@ var MyApp = (function($) {
             timeout: 750,
             success: function(data){
                 console.log("Received", data);
+                data.userId = parseInt(data.userId, 10);
                 // Add the data to local data:
-                var index = users.find(user => user.userId == data.userId);
+                var index = users.findIndex(user => user.userId == data.userId);
+                console.log(index, userId, data.userId);
                 // If it exists, overwrite:
                 if (index > -1) {
                     users[index] = data;
