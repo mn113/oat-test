@@ -26,6 +26,7 @@ var MyApp = (function($) {
                     getUserById(user.userId);
                 });
                 // Render all the users
+                renderUsers("#takers");
             },
             error: function(xhr, type) {
                 console.error('Ajax error! Trying again in 5s...');
@@ -47,7 +48,6 @@ var MyApp = (function($) {
                 data.userId = parseInt(data.userId, 10);
                 // Add the data to local data:
                 var index = users.findIndex(user => user.userId == data.userId);
-                console.log(index, userId, data.userId);
                 // If it exists, overwrite:
                 if (index > -1) {
                     users[index] = data;
@@ -57,6 +57,7 @@ var MyApp = (function($) {
                     users.push(data);
                 }
                 // Render the user's details:
+                //renderUser()
             },
             error: function(xhr, type) {
                 console.error('Ajax error! Could not retrieve user', userId);
@@ -67,18 +68,21 @@ var MyApp = (function($) {
     function renderUsers(target) {
         // Clear destination:
         $(target).html();
+        console.log("First", users[0]);
 
         if (users.length === 0) {
             $(target).html("No users found");
             return;
         }
         for (var user of users) {
-            var userItem = new UserItem(user);
-            $(target).append(userItem);
+            renderUser(user, target);
+            // var userItem = new UserItem(user);
+            // $(target).append(userItem);
         }
     }
 
-    function renderUser(userObj) {
+    function renderUser(userObj, target) {
+        console.log("Rendering user:", userObj);
         var html = `<li id="user${userObj.userId}">
             <h3>${userObj.firstName} ${userObj.lastName}</h3>`;
         if (userObj.details) {
@@ -87,7 +91,7 @@ var MyApp = (function($) {
             </div>`;
         }
         html += '</li>';
-        return html;
+        $(target).append(html);
     }
 
     // Reveal the module's methods:
