@@ -32,11 +32,13 @@ var MyApp = (function($) {
     // Using AJAX, fetch all users from the API:
     // TODO: implement extra params
     function getUsers(name = "", limit = 20, offset = 0) {
+        console.log("Function context", this);
         $.ajax({
             type: 'GET',
             url: `${apiBaseUrl}/users?name=${name}&limit=${limit}&offset=${offset}`,
             dataType: 'json',
             timeout: 750,
+            triesLeft: 5,
             success: function(data){
                 console.log("Received", data.length, "users");
                 // Store them locally:
@@ -50,14 +52,21 @@ var MyApp = (function($) {
                 // Re-enable button:
                 $("#fetcher").prop("disabled", false);
             },
-            error: function(xhr, type) {
-                console.error('Ajax error! Trying again in 5s...');
-                setTimeout(function() {
-                    getUsers();
-                }, 5000);
-                // TODO: check if this is a good practice...
+            error: function(xhr, textStatus, errorThrown) {
+                if (textStatus == 'timeout') {
+                    console.error('Ajax timeout!');
+                    // Try again, up to 5 times:
+                    this.triesLeft--;
+                    if (this.triesLeft > 0) {
+                        console.log('Trying again...', this.triesLeft);
+                        $.ajax(this);
+                    }
+                }
+                else {
+                    console.error(errorThrown);
+                }
             }
-        })
+        });
     }
 
     // Fetch a single user by his ID:
